@@ -1,30 +1,69 @@
 import express, { response } from "express"
 import cors from "cors"
-import { people } from "./people.js"
+import mysql from "mysql2"
+
+const {DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD } = process.env
 
 const app = express()
 const port = 3333
 
 app.use(cors())
 app.use(express.json())
-app.get("/", (request, response) => { 
-    response.json(people)
+app.get("/", (request, response) => {
+    const selecCommand = "SELECT name, email, age FROM arthurmoreira_02mc"
+
+    database.query(selecCommand, (error, users) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+
+        response.json(users)
+    })
+    
 })
 
 app.post("/cadastrar", (request, response) => {
     const {name, email, age, password } = request.body.user
 
-    console.log(`
-        Nome: ${name},
-        E-mail: ${email},
-        Idade: ${age},
-        Senha: ${password}
-    `)
+    const insertCommand = `
+        INSERT INTO arthurmoreira_02mc(name, email, age, password)
+        VALUES (?, ?, ?, ?)
+    `
 
-    response.status(201).json({ message: "Usuário cadastrado com sucesso!" })
+    database.query(insertCommand, [name, email, age, password], (error) => {
+        if (error){
+            console.log(error)
+            return
+        }
 
+        response.status(201).json({ message: "Usuário cadastrado com sucesso!" })
+    })
 }) 
+
+app.post("/login", (request, response) => {
+    const {email, password } = request.body.user
+
+    const selecCommand = "SELECT * FROM arthurmoreira_02mc WHERE email = ?"
+
+    database.query(selecCommand, [email], (error, user) => {
+        if(error) {
+            console.log(error)
+            return
+        }
+
+        
+    })
+})
 
 app.listen(port, () => {
     console.log(`Servidor rodando na porta: ${port}`)
+})
+
+const database = mysql.createPool({
+    database: DATABASE_NAME,
+    host: DATABASE_HOST,
+    user: DATABASE_USER,
+    password: DATABASE_PASSWORD,
+    connectionLimit: 10
 })
