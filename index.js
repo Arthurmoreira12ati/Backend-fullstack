@@ -7,7 +7,10 @@ const {DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD } = proces
 const app = express()
 const port = 3333
 
-app.use(cors())
+app.use(cors({
+    origin: "*"
+}))
+    
 app.use(express.json())
 app.get("/", (request, response) => {
     const selecCommand = "SELECT name, email, age FROM arthurmoreira_02mc"
