@@ -52,7 +52,12 @@ app.post("/login", (request, response) => {
             return
         }
 
-        
+        if (user.length === 0 || password !== user[0].password) {
+          response.json({ message: "Email ou senha incorretos"})
+         return
+        }
+
+        response.json({ id: user[0].id, name: user[0].name})
     })
 })
 
